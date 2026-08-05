@@ -1,0 +1,45 @@
+name: Deploy Pulse
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Monday 9am UTC
+  workflow_dispatch: {}
+
+# Allow the workflow to publish the generated dashboard to GitHub Pages.
+permissions:
+  contents: write
+
+jobs:
+  pulse:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Collect workflow runs
+        run: python -m src.collector
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Render dashboard
+        run: python -m src.dashboard
+
+      - name: Send weekly digest
+        run: python -m src.notify
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+
+      - name: Publish dashboard to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs
