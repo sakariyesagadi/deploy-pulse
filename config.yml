@@ -1,0 +1,28 @@
+# deploy-pulse configuration
+#
+# Environment variables referenced as ${VAR_NAME} are expanded at load time
+# (see src/config.py). Keep secrets out of this file — use .env / CI secrets.
+
+repos:
+  - owner: sakariyesagadi
+    name: football-organiser
+    workflows: ["ci.yml", "deploy.yml"]
+  - owner: sakariyesagadi
+    name: life-dashboard
+    workflows: ["test.yml"]
+
+scoring:
+  red_threshold: 0.70          # success rate below this => RED
+  yellow_threshold: 0.90       # success rate below this => YELLOW
+  streak_red: 3                # this many consecutive failures => RED
+  duration_increase_yellow: 0.20  # duration trend above this (20%) => YELLOW
+  flaky_yellow: 2              # this many flaky runs in 7d => YELLOW
+
+notifications:
+  slack_webhook: ${SLACK_WEBHOOK_URL}
+  email:
+    to: sakariye.sagadi@gmail.com
+    from: deploy-pulse@example.com
+    sendgrid_key: ${SENDGRID_API_KEY}
+
+schedule: "0 9 * * 1"  # Weekly Monday 9am UTC
