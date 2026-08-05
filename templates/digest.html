@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>deploy-pulse weekly digest</title>
+</head>
+<body style="margin:0;background:#f6f8fa;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#1f2328;">
+  <div style="max-width:640px;margin:0 auto;padding:24px;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#ffffff;border:1px solid #d0d7de;border-radius:12px;overflow:hidden;">
+      <tr>
+        <td style="padding:24px 28px;border-bottom:1px solid #d0d7de;">
+          <h1 style="margin:0;font-size:20px;">🩺 deploy-pulse weekly digest</h1>
+          <p style="margin:6px 0 0;color:#656d76;font-size:13px;">Generated {{ generated_at }}</p>
+        </td>
+      </tr>
+
+      <tr>
+        <td style="padding:20px 28px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+              <td align="center" style="padding:10px;background:#eafaef;border-radius:8px;">
+                <div style="font-size:26px;font-weight:700;color:#1a7f37;">{{ counts.GREEN }}</div>
+                <div style="font-size:11px;text-transform:uppercase;color:#656d76;">Green</div>
+              </td>
+              <td width="12"></td>
+              <td align="center" style="padding:10px;background:#fff8e6;border-radius:8px;">
+                <div style="font-size:26px;font-weight:700;color:#9a6700;">{{ counts.YELLOW }}</div>
+                <div style="font-size:11px;text-transform:uppercase;color:#656d76;">Yellow</div>
+              </td>
+              <td width="12"></td>
+              <td align="center" style="padding:10px;background:#ffebe9;border-radius:8px;">
+                <div style="font-size:26px;font-weight:700;color:#cf222e;">{{ counts.RED }}</div>
+                <div style="font-size:11px;text-transform:uppercase;color:#656d76;">Red</div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+
+      {% if trends %}
+      <tr>
+        <td style="padding:0 28px 8px;">
+          <h2 style="font-size:15px;margin:0 0 8px;">📈 This week's changes</h2>
+          <ul style="margin:0;padding-left:18px;font-size:13px;color:#1f2328;">
+            {% for t in trends %}
+            <li style="margin-bottom:6px;">
+              {% if t.severity == "critical" %}🔴{% else %}🟡{% endif %}
+              <strong>{{ t.repo }}</strong> / <code>{{ t.workflow }}</code> — {{ t.description }}
+            </li>
+            {% endfor %}
+          </ul>
+        </td>
+      </tr>
+      {% endif %}
+
+      <tr>
+        <td style="padding:16px 28px 8px;">
+          <h2 style="font-size:15px;margin:0 0 8px;">Workflow health</h2>
+        </td>
+      </tr>
+
+      {% for w in workflows %}
+      <tr>
+        <td style="padding:0 28px 12px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="border:1px solid #d0d7de;border-radius:8px;">
+            <tr>
+              <td style="padding:12px 14px;">
+                <div style="font-size:14px;font-weight:600;">
+                  {{ w.emoji }} {{ w.workflow }}
+                  <span style="color:#656d76;font-weight:400;">— {{ w.repo }}</span>
+                </div>
+                <div style="font-size:12px;color:#656d76;margin-top:4px;">
+                  Success 7d: <strong>{{ w.success_rate_7d_pct }}%</strong> ·
+                  Runs: {{ w.total_runs_7d }} ·
+                  Fail streak: {{ w.failure_streak }} ·
+                  Flaky: {{ w.flaky_count_7d }} ·
+                  Dur trend: {{ w.duration_trend_pct }}%
+                </div>
+                {% if w.reasons %}
+                <div style="font-size:12px;color:#656d76;margin-top:4px;">{{ w.reasons | join(" · ") }}</div>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td style="padding:0 28px 16px;color:#656d76;font-size:13px;">No workflow data collected yet.</td></tr>
+      {% endfor %}
+
+      <tr>
+        <td style="padding:16px 28px 24px;border-top:1px solid #d0d7de;color:#656d76;font-size:12px;">
+          Sent automatically by
+          <a href="https://github.com/sakariyesagadi/deploy-pulse" style="color:#0969da;">deploy-pulse</a>.
+        </td>
+      </tr>
+    </table>
+  </div>
+</body>
+</html>
